@@ -7,10 +7,8 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        # python-version: ['3.8', '3.9', '3.10']
-        # os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.10']
-        os: [ubuntu-latest]
+        python-version: ['3.8', '3.9', '3.10']
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -28,6 +26,8 @@ jobs:
         pip install twine
         pip install wheel
         pip install setuptools
+        pip install six
+        pip install "pycifrw>=4.4.3"
 
     - name: Build wheels
       run: |
@@ -51,34 +51,34 @@ jobs:
         tag: 0.0.0
         body: This is an alpha build of the diffpy.structure library (0.0.0)
 
-    - name: Checkout target repo
-      uses: actions/checkout@v3
-      env:
-        REPO: easyScience/pypi
-        REPO_PATH: pypi
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.ES_TOKEN }}
-        repository: ${{ env.REPO }}
-        path: ${{ env.REPO_PATH }}
-        ref: "master" 
-    - name: Copy index to new repo
-      env:
-        SOURCE: index.html
-        TARGET: pypi/structure/
-      run: cp ${{ env.SOURCE }} ${{ env.TARGET }}
-    - name: Push
-      shell: bash
-      env:
-        REPO_PATH: pypi
-        GIT_USERNAME: action
-        GIT_EMAIL: action@github.com
-      run: |
-        cd ${{ env.REPO_PATH }}
-        git config --local user.name "${{ env.GIT_USERNAME }}"
-        git config --local user.email "${{ env.GIT_EMAIL }}"
-        git add .
-        if [[ `git status --porcelain` ]]; then
-          git commit -m "Github Actions Automatically Built in `date +"%Y-%m-%d %H:%M"`"
-          git push
-        fi
+    # - name: Checkout target repo
+    #   uses: actions/checkout@v3
+    #   env:
+    #     REPO: easyScience/pypi
+    #     REPO_PATH: pypi
+    #   with:
+    #     fetch-depth: 0
+    #     token: ${{ secrets.ES_TOKEN }}
+    #     repository: ${{ env.REPO }}
+    #     path: ${{ env.REPO_PATH }}
+    #     ref: "master" 
+    # - name: Copy index to new repo
+    #   env:
+    #     SOURCE: index.html
+    #     TARGET: pypi/diffpy-structure/
+    #   run: cp ${{ env.SOURCE }} ${{ env.TARGET }}
+    # - name: Push
+    #   shell: bash
+    #   env:
+    #     REPO_PATH: pypi
+    #     GIT_USERNAME: action
+    #     GIT_EMAIL: action@github.com
+    #   run: |
+    #     cd ${{ env.REPO_PATH }}
+    #     git config --local user.name "${{ env.GIT_USERNAME }}"
+    #     git config --local user.email "${{ env.GIT_EMAIL }}"
+    #     git add .
+    #     if [[ `git status --porcelain` ]]; then
+    #       git commit -m "Github Actions Automatically Built in `date +"%Y-%m-%d %H:%M"`"
+    #       git push
+    #     fi
